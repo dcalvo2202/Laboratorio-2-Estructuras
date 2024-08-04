@@ -15,7 +15,11 @@ Palabras::Palabras(size_t _tam) {
 	}
 }
 
-Palabras::Palabras(const Palabras&) {
+Palabras::Palabras(const Palabras& palabra) {
+	tam = palabra.tam;
+	total = palabra.total;
+	for (int i = 0; i < tam; i++)
+		ptrPalabras[i] = palabra.ptrPalabras[i];
 }
 
 Palabras::~Palabras() {
@@ -25,19 +29,64 @@ Palabras::~Palabras() {
 	delete[]ptrPalabras;
 }
 
-void Palabras::insertar(std::string &palabra) {
+void Palabras::insertar(std::string& palabra) {
 	if (total < tam) {
 		ptrPalabras[total++] = &palabra;
 	}
 }
 
 bool Palabras::guardar() {
-	std::ofstream archivo("Palabras.txt");
-	return false;
+
+	try {
+		std::ofstream archivo("Palabras.txt");
+		return true;
+	}
+	catch (const std::exception& e) {
+		std::cerr << "Error: " << e.what() << "\n";
+		return false;
+	}
 }
 
-bool Palabras::recuperar()
+Palabras* Palabras::recuperar()
 {
-	return false;
+	std::ifstream archivo;
+	std::string palabra;
+	Palabras* pal = new Palabras();
+	try {
+		archivo.open("Palabras.txt");
+		if (archivo.good()) {
+			while (!archivo.eof()) {
+				archivo >> palabra;
+				pal->insertar(*new std::string(palabra));
+			}
+		}
+		archivo.close();
+		return pal;
+	}
+	catch (const std::exception& e) {
+		delete pal;
+		std::cerr << "Error: " << e.what() << "\n";
+		return nullptr;
+	}
+}
+
+
+std::string Palabras::toString() const
+{
+	std::stringstream s;
+	
+	s << "Palabras: \n";
+
+	try {
+		for (int i = 0; i < total; i++) {
+			s << "- " << *ptrPalabras[i] << "\n";
+		}
+	}
+	catch (const std::exception& e) {
+		std::cerr << "Error: " << e.what() << "\n";
+		return nullptr;
+	}
+
+	return s.str();
 }
 
